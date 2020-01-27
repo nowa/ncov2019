@@ -45,7 +45,7 @@ func main() {
 	var (
 		ret    int
 		data   string
-		cities []City
+		cities []model.City
 	)
 	_ = json.Unmarshal(body, &struct {
 		Ret  int     `json:"ret"`
