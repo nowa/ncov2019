@@ -1,15 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
+	"os"
 
 	"github.com/jroimartin/gocui"
-	"github.com/nowa/ncov2019/model"
-	"github.com/nowa/ncov2019/scraper"
+	"github.com/nowa/ncov2019/pkg/scraper"
 )
 
 func layout(g *gocui.Gui) error {
@@ -28,6 +25,14 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 }
 
 func main() {
+	log.Println("Getting all data...")
+	ncovdata, err := scraper.GetAllData()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Total cities: ", ncovdata)
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -42,13 +47,6 @@ func main() {
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
+		os.Exit(1)
 	}
-
-	log.Println("Getting all data...")
-	ncovdata, err := scraper.GetAllData()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Total cities: ", len(ncovdata))
 }
