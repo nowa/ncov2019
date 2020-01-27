@@ -12,7 +12,7 @@ var (
 	DataURL = "https://view.inews.qq.com/g2/getOnsInfo?name=wuwei_ww_area_counts"
 )
 
-func GetAllData() (*[]model.City, error) {
+func GetAllData() ([]*model.City, error) {
 	res, err := http.Get(DataURL)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func GetAllData() (*[]model.City, error) {
 	var (
 		ret    int
 		data   string
-		cities []model.City
+		cities []*model.City
 	)
 	_ = json.Unmarshal(body, &struct {
 		Ret  int     `json:"ret"`
@@ -35,5 +35,5 @@ func GetAllData() (*[]model.City, error) {
 	}{ret, &data})
 
 	_ = json.Unmarshal([]byte(data), &cities)
-	return &cities, nil
+	return cities, nil
 }
