@@ -3,6 +3,7 @@ package scraper
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/bitly/go-notify"
@@ -41,4 +42,14 @@ func GetAllData() ([]*model.City, error) {
 	notify.Post("_GETTING_DATA_", "done")
 
 	return cities, nil
+}
+
+func GetAndParseData() {
+	nd, err := GetAllData()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cd := model.ParseCountryData(nd)
+	notify.Post("_COUNTRY_DATA_UPDATED_", cd)
 }

@@ -21,6 +21,7 @@ func Layout(g *gocui.Gui) error {
 	}
 
 	_ = ShowCountryView(g)
+	_ = ShowBodyView(g)
 
 	return nil
 }
@@ -28,7 +29,17 @@ func Layout(g *gocui.Gui) error {
 func ShowCountryView(g *gocui.Gui) error {
 	maxX, _ := g.Size()
 
-	if err := CountryTitleView(g, 5, 5, maxX-5, 7); err != nil {
+	if err := CountryTitleView(g, 5, 3, maxX-5, 5); err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
+func ShowBodyView(g *gocui.Gui) error {
+	maxX, _ := g.Size()
+
+	if err := BodyView(g, 5, 5, maxX-5, 20); err != nil {
 		panic(err)
 	}
 

@@ -5,10 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/bitly/go-notify"
 	"github.com/jroimartin/gocui"
 	"github.com/nowa/ncov2019/cui"
-	"github.com/nowa/ncov2019/model"
+	// "github.com/nowa/ncov2019/model"
 	"github.com/nowa/ncov2019/pkg/scraper"
 )
 
@@ -24,17 +23,17 @@ func main() {
 	defer g.Close()
 
 	g.SetManagerFunc(cui.Layout)
+	g.Cursor = true
 	cui.G = g
 
-	go func() {
-		for range time.Tick(time.Second * 10) {
-			ncovdata, err := scraper.GetAllData()
-			if err != nil {
-				log.Fatal(err)
-			}
+	// Need to find a better way to do the first request (channel?)
+	time.AfterFunc(20*time.Millisecond, func() {
+		scraper.GetAndParseData()
+	})
 
-			cd := model.ParseCountryData(ncovdata)
-			notify.Post("_COUNTRY_DATA_UPDATED_", cd)
+	go func() {
+		for range time.Tick(time.Minute * 5) {
+			scraper.GetAndParseData()
 		}
 	}()
 

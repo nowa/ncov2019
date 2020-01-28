@@ -7,10 +7,10 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-func CountryTitleView(g *gocui.Gui, x, y, maxX, maxY int) error {
-	if v, err := g.SetView("countrytitle", x, y, maxX, maxY); err != nil {
+func BodyView(g *gocui.Gui, x, y, maxX, maxY int) error {
+	if v, err := g.SetView("body", x, y, maxX, maxY); err != nil {
 		if err != gocui.ErrUnknownView {
-			panic(err)
+			return err
 		}
 
 		v.FgColor = gocui.Attribute(15 + 1)
@@ -22,7 +22,7 @@ func CountryTitleView(g *gocui.Gui, x, y, maxX, maxY int) error {
 		v.Frame = false
 		v.Overwrite = true
 
-		fmt.Fprintf(v, "Loading...")
+		fmt.Fprintf(v, " ")
 
 		c := make(chan interface{})
 		notify.Start("_COUNTRY_DATA_UPDATED_", c)
@@ -33,9 +33,11 @@ func CountryTitleView(g *gocui.Gui, x, y, maxX, maxY int) error {
 
 				if ok && len(cd) > 1 {
 					g.Update(func(g *gocui.Gui) error {
-						var title = fmt.Sprintf("Infections in %d countries.", len(cd))
-						title = StringFormat(Color.QueryHeader, title, []string{"7"})
-						return UpdateView(g, "countrytitle", title)
+						m := ""
+						for k, ct := range cd {
+							m += StringRandom(fmt.Sprintf("%s has comfirmed %d, suspected %d, cured %d, dead %d.\n", k, ct["C"], ct["S"], ct["H"], ct["D"]))
+						}
+						return UpdateView(g, "body", m)
 					})
 				}
 			}

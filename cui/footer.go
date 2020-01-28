@@ -10,6 +10,10 @@ import (
 	"github.com/xeonx/timeago"
 )
 
+var (
+	LastUpdatedAt time.Time
+)
+
 func FooterView(g *gocui.Gui, x, y, maxX, maxY int) error {
 
 	if v, err := g.SetView("footer", x, y, maxX, maxY); err != nil {
@@ -32,18 +36,30 @@ func FooterView(g *gocui.Gui, x, y, maxX, maxY int) error {
 		notify.Start("_GETTING_DATA_", c)
 		go func() {
 			for {
+				var m string
 				data := <-c
 
 				status := []string{"doing", "done"}
 				if util.Contains(status, data.(string)) {
 					g.Update(func(g *gocui.Gui) error {
-						var m string
-						var t = time.Now()
 						if data.(string) == "doing" {
 							m = "Getting data from tencent..."
-						} else {
-							m = fmt.Sprintf("Last updated at %s", timeago.English.Format(t))
+						} else if data.(string) == "done" {
+							LastUpdatedAt = time.Now()
+							m = fmt.Sprintf("Done. Last updated at %s", timeago.English.Format(LastUpdatedAt))
 						}
+						return UpdateView(g, "footer", m)
+					})
+				}
+			}
+		}()
+
+		go func() {
+			for range time.Tick(time.Second * 10) {
+				var m string
+				if !LastUpdatedAt.IsZero() && time.Now().Sub(LastUpdatedAt).Seconds() >= 10 {
+					m = fmt.Sprintf("Last updated at %s", timeago.English.Format(LastUpdatedAt))
+					g.Update(func(g *gocui.Gui) error {
 						return UpdateView(g, "footer", m)
 					})
 				}

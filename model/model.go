@@ -21,8 +21,8 @@ type City struct {
 	Dead         int  `json:"dead"`
 }
 
-func ParseCountryData(cities []*City) []map[string]int {
-	c, s, h, d := make(map[string]int), make(map[string]int), make(map[string]int), make(map[string]int)
+func ParseCountryData(cities []*City) map[string]map[string]int {
+	c := make(map[string]map[string]int)
 
 	for _, city := range cities {
 		if city.Name == "" && city.Country.Name == "中国" {
@@ -32,13 +32,17 @@ func ParseCountryData(cities []*City) []map[string]int {
 		}
 
 		country := city.Country
-		c[country.Name] += city.Confirmed
-		s[country.Name] += city.Suspected
-		h[country.Name] += city.Cured
-		d[country.Name] += city.Dead
+
+		if c[country.Name] == nil {
+			c[country.Name] = make(map[string]int)
+		}
+		c[country.Name]["C"] += city.Confirmed
+		c[country.Name]["S"] += city.Suspected
+		c[country.Name]["H"] += city.Cured
+		c[country.Name]["D"] += city.Dead
 	}
 
 	// log.Println("c: ", c)
 
-	return []map[string]int{c, s, h, d}
+	return c
 }
