@@ -1,8 +1,6 @@
 package model
 
-import (
-	"log"
-)
+import ()
 
 type Country struct {
 	Name string `json:"country"`
@@ -23,12 +21,12 @@ type City struct {
 	Dead         int  `json:"dead"`
 }
 
-func ParseData(cities []*City) map[string]int {
-	m, c, s, h, d := make(map[string]int), make(map[string]int), make(map[string]int), make(map[string]int), make(map[string]int)
+func ParseCountryData(cities []*City) []map[string]int {
+	c, s, h, d := make(map[string]int), make(map[string]int), make(map[string]int), make(map[string]int)
 
 	for _, city := range cities {
 		if city.Name == "" && city.Country.Name == "中国" {
-			log.Println("Municipality: ", city)
+			// log.Println("Municipality: ", city)
 			city.Name = city.Province.Name
 			city.Municipality = true
 		}
@@ -40,7 +38,7 @@ func ParseData(cities []*City) map[string]int {
 		d[country.Name] += city.Dead
 	}
 
-	log.Println("c: ", c)
+	// log.Println("c: ", c)
 
-	return m
+	return []map[string]int{c, s, h, d}
 }
