@@ -2,8 +2,12 @@ package cui
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/bitly/go-notify"
 	"github.com/jroimartin/gocui"
+	"github.com/nowa/ncov2019/util"
+	"github.com/xeonx/timeago"
 )
 
 func FooterView(g *gocui.Gui, x, y, maxX, maxY int) error {
@@ -23,6 +27,28 @@ func FooterView(g *gocui.Gui, x, y, maxX, maxY int) error {
 		v.Overwrite = true
 
 		fmt.Fprintf(v, "...")
+
+		c := make(chan interface{})
+		notify.Start("_GETTING_DATA_", c)
+		go func() {
+			for {
+				data := <-c
+
+				status := []string{"doing", "done"}
+				if util.Contains(status, data.(string)) {
+					g.Update(func(g *gocui.Gui) error {
+						var m string
+						var t = time.Now()
+						if data.(string) == "doing" {
+							m = "Getting data from tencent..."
+						} else {
+							m = fmt.Sprintf("Last updated at %s", timeago.English.Format(t))
+						}
+						return UpdateView(g, "footer", m)
+					})
+				}
+			}
+		}()
 	}
 
 	return nil

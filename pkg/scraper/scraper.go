@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/bitly/go-notify"
 	"github.com/nowa/ncov2019/model"
 )
 
@@ -13,6 +14,8 @@ var (
 )
 
 func GetAllData() ([]*model.City, error) {
+	notify.Post("_GETTING_DATA_", "doing")
+
 	res, err := http.Get(DataURL)
 	if err != nil {
 		return nil, err
@@ -35,5 +38,7 @@ func GetAllData() ([]*model.City, error) {
 	}{ret, &data})
 
 	_ = json.Unmarshal([]byte(data), &cities)
+	notify.Post("_GETTING_DATA_", "done")
+
 	return cities, nil
 }
